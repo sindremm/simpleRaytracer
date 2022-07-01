@@ -29,7 +29,7 @@ int main() {
     Object a{{1, 2, 3}};
     test_pos<Object>(a);
 
-    Ray b{{4, 5, 6}, {7, 8, 9}};
+    Ray b{{4, 5, 6}, {7, 8, 9}, &a};
     test_pos<Ray>(b);
     test_dir<Ray>(b);
 
@@ -44,10 +44,19 @@ int main() {
     test_pos<Sphere>(s);
     std::cout << "radius: " << s.radius << " squared: " << s.radius_squared << '\n'; 
 
+    /*
+    nvec3 nv{};
+    std::cout << "nv:\n";
+    for (auto n : nv) {
+        std::cout << n << '\n';
+    }    
 
-    
-
-
+    nvec3 nv2{1.1, 2.2, 3.3};
+    std::cout << "nv2:\n";
+    for (auto n : nv2) {
+        std::cout << n << '\n';
+    }    
+    */
 
     return 0;
 }

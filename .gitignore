@@ -30,3 +30,12 @@
 *.exe
 *.out
 *.app
+
+# Project specific
+.vscode/
+build.sh
+debug.sh
+gen.sh
+release.sh
+image.ppm
+out/

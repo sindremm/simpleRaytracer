@@ -8,7 +8,7 @@
 
 class Sphere : public HittableObject {
     public:
-        Sphere(vec3 sphere_center, double sphere_radius);
+        Sphere(point sphere_center, double sphere_radius);
         double radius;
         double radius_squared;
 };
