@@ -66,6 +66,8 @@ class vec3 : private std::array<double, 3> {
         double length() const;
         double lenght_squared() const;
 
+        void print() const;
+
         using std::array<double, 3>::begin;
         using std::array<double, 3>::end;
         using std::array<double, 3>::fill;

@@ -8,7 +8,7 @@
 #define CAM_H
 class Camera : public Ray {
     public:
-        Camera(vec3 pos, vec3 dir);
+        Camera(point pos, vector dir);
 };
 
 

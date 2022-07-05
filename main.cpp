@@ -29,7 +29,7 @@ int main() {
     Object a{{1, 2, 3}};
     test_pos<Object>(a);
 
-    Ray b{{4, 5, 6}, {7, 8, 9}, &a};
+    Ray b{{0, 0, 0}, {1, 0, 0}, &a};
     test_pos<Ray>(b);
     test_dir<Ray>(b);
 
@@ -43,7 +43,8 @@ int main() {
     Sphere s{{10, 0, 0}, 5};
     test_pos<Sphere>(s);
     std::cout << "radius: " << s.radius << " squared: " << s.radius_squared << '\n'; 
-
+    
+    b.shoot(s);
     /*
     nvec3 nv{};
     std::cout << "nv:\n";
