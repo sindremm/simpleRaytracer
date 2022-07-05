@@ -1,4 +1,4 @@
 #include "camera.h"
 
 
-Camera::Camera(vec3 pos, vec3 dir) : Ray{pos, dir, this} {}
+Camera::Camera(point pos, vector dir) : Ray{pos, dir, this} {}

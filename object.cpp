@@ -1,6 +1,6 @@
 #include "object.h"
 
-Object::Object(vec3 pos) : position{pos} {}
+Object::Object(point pos) : position{pos} {}
 
 
-HittableObject::HittableObject(vec3 pos) : Object{pos} {}
+HittableObject::HittableObject(point pos) : Object{pos} {}

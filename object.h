@@ -9,16 +9,16 @@
 
 class Object {
     public:
-        vec3 position;
+        point position;
 
-        Object(vec3 pos);
+        Object(point pos);
 
 };
 
 
 class HittableObject : public Object {
     public:
-        HittableObject(vec3 pos);
+        HittableObject(point pos);
 
 };
 

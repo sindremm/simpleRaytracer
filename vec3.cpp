@@ -34,7 +34,7 @@ vec3& vec3::operator/=(const double t) {
 }
 
 
-vec3 unit_vector(vec3 v) {
+vec3 vec3::unit_vector(vec3 v) {
     return v / v.length();
 }
 
@@ -44,4 +44,12 @@ double vec3::length() const {
 
 double vec3::lenght_squared() const {
     return at(0)*at(0) + at(1)*at(1) + at(2)*at(2);
+}
+
+
+void vec3::print() const {
+    std::cout   
+    << "\t\t x: " << x() << "\n"
+    << "\t\t y: " << y() << "\n"
+    << "\t\t z: " << z() << "\n";
 }
