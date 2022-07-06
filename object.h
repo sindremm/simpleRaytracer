@@ -18,7 +18,8 @@ class Object {
 
 class HittableObject : public Object {
     public:
-        HittableObject(point pos);
+        HittableObject(point pos, color col);
+        color color_value;
 
 };
 

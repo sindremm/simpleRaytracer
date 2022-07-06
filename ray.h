@@ -20,7 +20,7 @@ class Ray : public Object{
         vector direction;
         Object* source;
         void normalize();
-        Object* shoot(Sphere& target_sphere);
+        color* shoot(Sphere& target_sphere);
         void print() const;
 
     private:
