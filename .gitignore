@@ -37,5 +37,5 @@ build.sh
 debug.sh
 gen.sh
 release.sh
-image.ppm
+*.ppm
 out/

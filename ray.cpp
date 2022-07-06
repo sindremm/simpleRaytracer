@@ -76,9 +76,10 @@ Ray Ray::find_intersection_normal(double intersection_distance, Sphere& target_s
 };
 
 
-Object* Ray::shoot(Sphere& target_sphere) {
-    // Testing when miss
-    Object miss{{404, 404, 404}};
+color* Ray::shoot(Sphere& target_sphere) {
+    // Miss color
+    color miss{0, 0, 0};
+   
 
     // Fin the ray to sphere vector and calculate the squared distance
     vector rs_vector = get_ray_sphere_vector(target_sphere);
@@ -107,6 +108,6 @@ Object* Ray::shoot(Sphere& target_sphere) {
     Ray normal = find_intersection_normal(inter_dist, target_sphere);
     std::cout << "normal: \n";
     normal.print();
-    return &normal;
+    return &target_sphere.color_value;
 
 }

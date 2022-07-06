@@ -13,7 +13,7 @@ double& vec3::operator[](int i) {
     return at(i);
 }
 
-vec3& vec3::operator+=(vec3 &v) {
+vec3& vec3::operator+=(const vec3 &v) {
     at(0) += v.x();
     at(1) += v.y();
     at(2) += v.z();
@@ -49,7 +49,7 @@ double vec3::lenght_squared() const {
 
 void vec3::print() const {
     std::cout   
-    << "\t\t x: " << x() << "\n"
-    << "\t\t y: " << y() << "\n"
-    << "\t\t z: " << z() << "\n";
+    << "x: " << x() << ", "
+    << "y: " << y() << ", "
+    << "z: " << z() << "\n";
 }
