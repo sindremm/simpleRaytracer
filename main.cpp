@@ -26,33 +26,18 @@ void test_dir(T f) {
 
 int main() {
     
-
-    Object test_object{{1, 2, 3}};
-    test_pos<Object>(test_object);
-
-    Ray test_ray{{0, 0, 0}, {1, 0, 0}, &test_object};
-    test_pos<Ray>(test_ray);
-    test_dir<Ray>(test_ray);
-
-    test_ray.normalize();
-    test_dir<Ray>(test_ray);
-
     Camera camera{{0, 0, 0}, 16.0 / 9.0, 400};
     test_pos<Camera>(camera);
 
-    Sphere sphere{{10, 0, 0}, {255, 0, 0}, 5};
+    Sphere sphere{{0, 0,  20}, {255, 0, 0}, 5};
     test_pos<Sphere>(sphere);
-    std::cout << "radius: " << sphere.radius << " squared: " << sphere.radius_squared << '\n'; 
-    
-    test_ray.shoot(sphere);
-    
 
     // Create and output to file
     std::filebuf fb{};
-    fb.open("test1.ppm", std::ios::out);
+    fb.open("/out/renders/test1.ppm", std::ios::out);
     std::ostream out{&fb};
 
-    camera.take_picture(out);
+    camera.take_picture(out, sphere);
 
     fb.close();
     return 0;

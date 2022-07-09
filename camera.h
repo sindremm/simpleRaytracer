@@ -24,8 +24,10 @@ class Camera : public Object {
         int image_width;
         int image_height;
 
-        color shoot_rays(double pixel_x, double pixel_y);
-        std::ostream& take_picture(std::ostream& output);
+        // temporary target argument for both shoot_rays and take_picture functions
+        // change Object argument to environment and loop over every object in the sceene
+        color shoot_rays(double pixel_x, double pixel_y, Sphere& target);
+        std::ostream& take_picture(std::ostream& output, Sphere& target);
 
     private:
        double viewport_height = 2.0;
