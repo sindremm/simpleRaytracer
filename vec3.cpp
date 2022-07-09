@@ -33,11 +33,6 @@ vec3& vec3::operator/=(const double t) {
     return *this *= 1/t;
 }
 
-
-vec3 vec3::unit_vector(vec3 v) {
-    return v / v.length();
-}
-
 double vec3::length() const {
     return std::sqrt(lenght_squared());
 }

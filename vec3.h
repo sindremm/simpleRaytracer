@@ -14,9 +14,9 @@ class vec3 : private std::array<double, 3> {
         vec3(double x, double y, double z) : std::array<double, 3>{} {this->at(0) = x; this->at(1) = y; this->at(2) = z;};
 
 
-        double x() const { return at(0); };
-        double y() const { return at(1); };
-        double z() const { return at(2); };
+        double x() const { return this->at(0); };
+        double y() const { return this->at(1); };
+        double z() const { return this->at(2); };
 
         vec3 operator-() const;
         double operator[](int i) const;
@@ -34,7 +34,7 @@ class vec3 : private std::array<double, 3> {
         friend double dot(const vec3 &u, const vec3 &v);
         friend vec3 cross(const vec3 &u, const vec3 &v);
 
-        vec3 unit_vector(vec3 v);
+        friend vec3 unit_vector(vec3 v);
         double length() const;
         double lenght_squared() const;
 
@@ -84,6 +84,10 @@ inline vec3 cross(const vec3 &u, const vec3 &v) {
                 u.z() * v.x() - u.x() * v.z(),
                 u.x() * v.y() - u.y() * v.x()
     };
+}
+
+inline vec3 unit_vector(vec3 v) {
+    return v / v.length();
 }
 
 #endif

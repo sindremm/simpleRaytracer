@@ -33,9 +33,6 @@
 
 # Project specific
 .vscode/
-build.sh
-debug.sh
-gen.sh
-release.sh
+*.sh
 *.ppm
 out/
