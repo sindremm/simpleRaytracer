@@ -7,6 +7,24 @@
 #ifndef CAM_H
 #define CAM_H
 class Camera : public Object {
+    private:
+        // camera spesifications
+        double viewport_height = 2.0;
+        double viewport_width;
+        double focal_length = 1.0; 
+        double pixel_width;
+        double pixel_heigth;
+
+
+        // function implementations for the sampling_methods
+        color single_sample_fill(vector x_coordinate, vector y_coordinate, Sphere& target_sphere);
+        color five_sample_fill(vector x_coordinate, vector y_coordinate, Sphere& target_sphere);
+        color jitter_sample_fill(vector x_coordinate, vector y_coordinate, Sphere& target_sphere);
+
+        // fill assigned pixel
+        color fill_pixel(double pixel_x, double pixel_y, Sphere& target);
+
+
     public:
         Camera(point pos, double a_ratio, double i_width);
         // Orientation of camera
@@ -26,15 +44,20 @@ class Camera : public Object {
 
         // temporary target argument for both shoot_rays and take_picture functions
         // change Object argument to environment and loop over every object in the sceene
-        color shoot_rays(double pixel_x, double pixel_y, Sphere& target);
         std::ostream& take_picture(std::ostream& output, Sphere& target);
 
-    private:
-       double viewport_height = 2.0;
-       double viewport_width;
-       double focal_length = 1.0; 
-       double pixel_width;
-       double pixel_heigth;
+        // sampling methods
+        enum class sample_method {
+            single,
+            five,
+            jitter
+        };
+
+        sample_method current_method;
+
+        // get and set the sample method to be used for rendering
+        sample_method get_sample_method() const { return current_method; };
+        void set_sample_method(sample_method new_method) { current_method = new_method; };
 };
 
 

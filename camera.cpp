@@ -9,16 +9,16 @@ Camera::Camera(point pos, double a_ratio, double i_width) : Object{pos}, aspect_
     // set the width and height of the pixels
     pixel_width = viewport_width / image_width;
     pixel_heigth = viewport_height / image_height;
-    std::cout << "pixel_width: " << pixel_width << "\n"
-    << "pixel_height: " << pixel_heigth << "\n"
-    << "image_width: " << image_width << "\n"
-    << "image_height: " << image_height << "\n"
-    << "viewport_width: " << viewport_width << "\n"
-    << "viewport_height: " << viewport_height << "\n";
 
+    // set the standard sampling method
+    current_method = sample_method::single;
 }
 
-color Camera::shoot_rays(double pixel_x, double pixel_y, Sphere& target) {
+color Camera::fill_pixel(double pixel_x, double pixel_y, Sphere& target) {
+    /*
+    Find the vector of the ray through the middle of the pixel and shoot
+    rays with the selected sampling method
+    */
     // transpose grid position to position in scene
     vector x_coordinate = x_axis * (- viewport_width / 2 + pixel_width * pixel_x);
     vector y_coordinate = y_axis * (viewport_height / 2 - pixel_heigth * pixel_y);
@@ -27,14 +27,53 @@ color Camera::shoot_rays(double pixel_x, double pixel_y, Sphere& target) {
     x_coordinate += x_axis * pixel_width/2;
     y_coordinate += y_axis * pixel_heigth/2;
 
-    // Todo: Shoot several vectors randomly within one pixel
+    color result_color;
+
+    switch(current_method){
+        case sample_method::single: {
+            result_color = single_sample_fill(x_coordinate, y_coordinate, target);
+            break;
+        }
+
+        case sample_method::five: {
+            result_color = five_sample_fill(x_coordinate, y_coordinate, target);
+            break; 
+        }
+
+        case sample_method::jitter: {
+
+        }
+    };
 
     // get pixel position
-    vector vector_to_pixel = unit_vector(x_coordinate + y_coordinate + direction * focal_length);
+    return result_color;
 
-    // Todo: create and shoot ray
+}
+
+
+color Camera::single_sample_fill(vector x_coordinate, vector y_coordinate, Sphere& target_sphere) {
+    vector vector_to_pixel = unit_vector(x_coordinate + y_coordinate + direction * focal_length);
     Ray shooting_ray{position, vector_to_pixel, this};
-    return shooting_ray.shoot(target);
+
+    return shooting_ray.shoot(target_sphere);
+}
+
+color Camera::five_sample_fill(vector x_coordinate, vector y_coordinate, Sphere& target_sphere) {
+    // add middle ray
+    color total_color = Ray{position, unit_vector(x_coordinate + y_coordinate + direction * focal_length), this}.shoot(target_sphere);
+
+    for (double w = -1; w <= 1; w += 2) {
+        for (double h = -1; h <= 1; h += 2) {
+            vector quadrant_vectors = unit_vector(vector{x_coordinate.x() + w * pixel_width/4 , y_coordinate.y() + h * pixel_heigth/4, direction.z()});
+            Ray shoot_ray{position, quadrant_vectors, this};
+            total_color += shoot_ray.shoot(target_sphere);
+        }
+    }
+
+    return total_color/5; 
+}
+
+color Camera::jitter_sample_fill(vector x_coordinate, vector y_coordinate, Sphere& target_sphere) {
 
 }
 
@@ -51,7 +90,7 @@ std::ostream& Camera::take_picture(std::ostream& output, Sphere& target) {
         int progress = percentage * (image_height - h);
         std::cout << "\r progress: " << '[' << std::string(progress, '#') << std::string(max_p - progress, '-') << ']' << std::flush; 
         for (int w = 0; w < image_width; w++) {
-            color pixel_color = shoot_rays(w, h, target);
+            color pixel_color = fill_pixel(w, h, target);
             output << pixel_color.x() << " " << pixel_color.y() << " " << pixel_color.z() << "\n";
         }
 
