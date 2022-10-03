@@ -1,5 +1,8 @@
 #include "camera.h"
 #include <fstream>
+#include <random>
+#include <time.h>
+#include <math.h>
 
 Camera::Camera(point pos, double a_ratio, double i_width) : Object{pos}, aspect_ratio{a_ratio} {
     image_width = static_cast<int>(i_width);
@@ -12,6 +15,9 @@ Camera::Camera(point pos, double a_ratio, double i_width) : Object{pos}, aspect_
 
     // set the standard sampling method
     current_method = sample_method::single;
+
+    // Set seed for random generator
+    srand(time(nullptr));
 }
 
 color Camera::fill_pixel(double pixel_x, double pixel_y, Sphere& target) {
@@ -41,7 +47,8 @@ color Camera::fill_pixel(double pixel_x, double pixel_y, Sphere& target) {
         }
 
         case sample_method::jitter: {
-
+            result_color = jitter_sample_fill(x_coordinate, y_coordinate, target);
+            break;
         }
     };
 
@@ -62,6 +69,7 @@ color Camera::five_sample_fill(vector x_coordinate, vector y_coordinate, Sphere&
     // add middle ray
     color total_color = Ray{position, unit_vector(x_coordinate + y_coordinate + direction * focal_length), this}.shoot(target_sphere);
 
+    // add two rays on each diagonal
     for (double w = -1; w <= 1; w += 2) {
         for (double h = -1; h <= 1; h += 2) {
             vector quadrant_vectors = unit_vector(vector{x_coordinate.x() + w * pixel_width/4 , y_coordinate.y() + h * pixel_heigth/4, direction.z()});
@@ -70,11 +78,24 @@ color Camera::five_sample_fill(vector x_coordinate, vector y_coordinate, Sphere&
         }
     }
 
+    // return the average color value
     return total_color/5; 
 }
 
 color Camera::jitter_sample_fill(vector x_coordinate, vector y_coordinate, Sphere& target_sphere) {
+    color total_color;
+    int total_samples = 30;
+    for (int i = 0; i < total_samples; i++) {
+        double random_x =  (static_cast<double>(rand()) / RAND_MAX) * pixel_width - pixel_width/2;
+        double random_y = (static_cast<double>(rand()) / RAND_MAX) * pixel_heigth - pixel_heigth/2;
 
+        // create random vector within pixel
+        vector vec = unit_vector(vector{x_coordinate.x() + random_x, y_coordinate.y() + random_y, direction.z()});
+        Ray shoot_ray{position, vec, this};
+        total_color += shoot_ray.shoot(target_sphere);
+    }
+
+    return total_color/total_samples;
 }
 
 
