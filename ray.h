@@ -16,6 +16,7 @@
 
 class Ray : public Object{
     public:
+        Ray();
         Ray(point pos, vector dir, Object* src);
         vector direction;
         Object* source;

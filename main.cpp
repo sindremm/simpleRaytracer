@@ -26,18 +26,18 @@ void test_dir(T f) {
 
 int main() {
     
-    Camera camera{{0, 0, 0}, 16.0 / 9.0, 400};
-    test_pos<Camera>(camera);
+    Camera camera{{0, 0, 0}, 16.0 / 9.0, 1920};
 
-    Sphere sphere{{0, 0,  20}, {255, 0, 0}, 5};
-    test_pos<Sphere>(sphere);
+    Sphere sphere1{{1, 1,  10}, {50, 200, 200}, 5};
+    Sphere sphere2{{1, 1, 5}, {100, 255, 40}, 2};
 
     // Create and output to file
     std::filebuf fb{};
-    fb.open("/out/renders/test1.ppm", std::ios::out);
+    fb.open("out/renders/BigJitter30samples.ppm", std::ios::out);
     std::ostream out{&fb};
 
-    camera.take_picture(out, sphere);
+    camera.set_sample_method(Camera::sample_method::jitter);
+    camera.take_picture(out, sphere1);
 
     fb.close();
     return 0;

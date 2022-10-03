@@ -3,6 +3,8 @@
 #include <vector>
 #include <numeric>
 
+Ray::Ray() : Object{{0, 0, 0}}, direction{0, 0, 0}, source{NULL} {}
+
 Ray::Ray(point pos, vector dir, Object* src) : Object{pos}, direction{dir}, source{src} {}
 
 void Ray::print() const {
