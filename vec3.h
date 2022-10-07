@@ -36,7 +36,7 @@ class vec3 : private std::array<double, 3> {
 
         friend vec3 unit_vector(vec3 v);
         double length() const;
-        double lenght_squared() const;
+        double length_squared() const;
 
         void print() const;
 

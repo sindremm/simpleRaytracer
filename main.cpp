@@ -28,16 +28,20 @@ int main() {
     
     Camera camera{{0, 0, 0}, 16.0 / 9.0, 1920};
 
-    Sphere sphere1{{1, 1,  10}, {50, 200, 200}, 5};
-    Sphere sphere2{{1, 1, 5}, {100, 255, 40}, 2};
+    Sphere sphere1{{1, 2,  10}, {50, 200, 200}, 5};
+    Sphere sphere2{{3, 4, 5}, {100, 255, 40}, 2};
+
+    Environment env; 
+    env.add_hittable_object(&sphere1);
+    env.add_hittable_object(&sphere2);
 
     // Create and output to file
     std::filebuf fb{};
-    fb.open("out/renders/BigJitter30samples.ppm", std::ios::out);
+    fb.open("C:\\Users\\47458\\Documents\\Programming\\simpleRayTracer\\out\\renders\\MultiTest.ppm", std::ios::out);
     std::ostream out{&fb};
 
     camera.set_sample_method(Camera::sample_method::jitter);
-    camera.take_picture(out, sphere1);
+    camera.take_picture(out, env);
 
     fb.close();
     return 0;

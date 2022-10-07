@@ -1,4 +1,6 @@
 #include "camera.h"
+#include "environment.h"
+
 #include <fstream>
 #include <random>
 #include <time.h>
@@ -20,7 +22,7 @@ Camera::Camera(point pos, double a_ratio, double i_width) : Object{pos}, aspect_
     srand(time(nullptr));
 }
 
-color Camera::fill_pixel(double pixel_x, double pixel_y, Sphere& target) {
+color Camera::fill_pixel(double pixel_x, double pixel_y, Environment& env) {
     /*
     Find the vector of the ray through the middle of the pixel and shoot
     rays with the selected sampling method
@@ -37,17 +39,17 @@ color Camera::fill_pixel(double pixel_x, double pixel_y, Sphere& target) {
 
     switch(current_method){
         case sample_method::single: {
-            result_color = single_sample_fill(x_coordinate, y_coordinate, target);
+            result_color = single_sample_fill(x_coordinate, y_coordinate, env);
             break;
         }
 
         case sample_method::five: {
-            result_color = five_sample_fill(x_coordinate, y_coordinate, target);
+            result_color = five_sample_fill(x_coordinate, y_coordinate, env);
             break; 
         }
 
         case sample_method::jitter: {
-            result_color = jitter_sample_fill(x_coordinate, y_coordinate, target);
+            result_color = jitter_sample_fill(x_coordinate, y_coordinate, env);
             break;
         }
     };
@@ -57,24 +59,51 @@ color Camera::fill_pixel(double pixel_x, double pixel_y, Sphere& target) {
 
 }
 
+BounceRay* Camera::first_object_hit(const std::vector<BounceRay*>& result_normals) {
+    if (result_normals.size() == 0) {
+        return nullptr;
+    }
 
-color Camera::single_sample_fill(vector x_coordinate, vector y_coordinate, Sphere& target_sphere) {
-    vector vector_to_pixel = unit_vector(x_coordinate + y_coordinate + direction * focal_length);
-    Ray shooting_ray{position, vector_to_pixel, this};
-
-    return shooting_ray.shoot(target_sphere);
+    BounceRay* closest_ray = result_normals.at(0);
+    for (std::vector<BounceRay*>::const_iterator it = result_normals.begin(); it != result_normals.end(); ++it) {
+        if (((*it)->position - position).length_squared() < (closest_ray->position - position).length_squared()) {
+            closest_ray = *it;
+        }
+    }
+    return closest_ray;
 }
 
-color Camera::five_sample_fill(vector x_coordinate, vector y_coordinate, Sphere& target_sphere) {
-    // add middle ray
-    color total_color = Ray{position, unit_vector(x_coordinate + y_coordinate + direction * focal_length), this}.shoot(target_sphere);
+color Camera::single_sample_fill(vector x_coordinate, vector y_coordinate, Environment& env) {
+    vector vector_to_pixel = unit_vector(x_coordinate + y_coordinate + direction * focal_length);
+    Ray camera_ray{position, vector_to_pixel, this};
+
+        // Add every object hit to vector
+        std::vector<BounceRay*> hit_objects;
+        for (auto a : env.get_hit_obj()) {
+            a->calculate_hit(camera_ray, hit_objects);
+        }
+
+        BounceRay* closest_ray = first_object_hit(hit_objects);
+        return closest_ray->source->color_value;
+}
+
+color Camera::five_sample_fill(vector x_coordinate, vector y_coordinate, Environment& env) {
+    color total_color = color{};
 
     // add two rays on each diagonal
     for (double w = -1; w <= 1; w += 2) {
         for (double h = -1; h <= 1; h += 2) {
             vector quadrant_vectors = unit_vector(vector{x_coordinate.x() + w * pixel_width/4 , y_coordinate.y() + h * pixel_heigth/4, direction.z()});
-            Ray shoot_ray{position, quadrant_vectors, this};
-            total_color += shoot_ray.shoot(target_sphere);
+            Ray camera_ray{position, quadrant_vectors, this};
+
+            // Add every object hit to vector
+            std::vector<BounceRay*> hit_objects;
+            for (auto a : env.get_hit_obj()) {
+                a->calculate_hit(camera_ray, hit_objects);
+            }
+
+            BounceRay* closest_ray = first_object_hit(hit_objects);
+            total_color += closest_ray->source->color_value;
         }
     }
 
@@ -82,7 +111,7 @@ color Camera::five_sample_fill(vector x_coordinate, vector y_coordinate, Sphere&
     return total_color/5; 
 }
 
-color Camera::jitter_sample_fill(vector x_coordinate, vector y_coordinate, Sphere& target_sphere) {
+color Camera::jitter_sample_fill(vector x_coordinate, vector y_coordinate, Environment& env) {
     color total_color;
     int total_samples = 30;
     for (int i = 0; i < total_samples; i++) {
@@ -91,15 +120,30 @@ color Camera::jitter_sample_fill(vector x_coordinate, vector y_coordinate, Spher
 
         // create random vector within pixel
         vector vec = unit_vector(vector{x_coordinate.x() + random_x, y_coordinate.y() + random_y, direction.z()});
-        Ray shoot_ray{position, vec, this};
-        total_color += shoot_ray.shoot(target_sphere);
-    }
+        Ray camera_ray{position, vec, this};
 
+        // Add every object hit to vector
+        std::vector<BounceRay*> hit_objects;
+        for (auto a : env.get_hit_obj()) {
+            a->calculate_hit(camera_ray, hit_objects);
+        }
+
+        BounceRay* closest_ray = first_object_hit(hit_objects);
+        if (closest_ray != nullptr) {
+            total_color += closest_ray->source->color_value;
+        } else {
+            total_color += {20, 20, 20};
+        }
+        delete closest_ray;
+
+    }    
+    
     return total_color/total_samples;
 }
 
+           
 
-std::ostream& Camera::take_picture(std::ostream& output, Sphere& target) {
+std::ostream& Camera::take_picture(std::ostream& output, Environment& env) {
     std::cout << "Starting rendering...\n";
     // setupt .ppm file
     output << "P3\n" << image_width << " " << image_height << "\n255\n";
@@ -111,7 +155,7 @@ std::ostream& Camera::take_picture(std::ostream& output, Sphere& target) {
         int progress = percentage * (image_height - h);
         std::cout << "\r progress: " << '[' << std::string(progress, '#') << std::string(max_p - progress, '-') << ']' << std::flush; 
         for (int w = 0; w < image_width; w++) {
-            color pixel_color = fill_pixel(w, h, target);
+            color pixel_color = fill_pixel(w, h, env);
             output << pixel_color.x() << " " << pixel_color.y() << " " << pixel_color.z() << "\n";
         }
 
