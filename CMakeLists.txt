@@ -9,6 +9,9 @@ set(SOURCES
     camera.cpp
     ray.cpp
     sphere.cpp
+    environment.cpp
+    light.cpp
+    objecthit.cpp
 )
 
 

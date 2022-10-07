@@ -1,11 +1,10 @@
-#ifndef RAY_H
-#include "ray.h"
-#endif
-
-
-
 #ifndef CAM_H
 #define CAM_H
+
+#include "ray.h"
+#include "sphere.h"
+#include "environment.h"
+
 class Camera : public Object {
     private:
         // camera spesifications
@@ -17,12 +16,16 @@ class Camera : public Object {
 
 
         // function implementations for the sampling_methods
-        color single_sample_fill(vector x_coordinate, vector y_coordinate, Sphere& target_sphere);
-        color five_sample_fill(vector x_coordinate, vector y_coordinate, Sphere& target_sphere);
-        color jitter_sample_fill(vector x_coordinate, vector y_coordinate, Sphere& target_sphere);
+        color single_sample_fill(vector x_coordinate, vector y_coordinate, Environment& env);
+        color five_sample_fill(vector x_coordinate, vector y_coordinate, Environment& env);
+        color jitter_sample_fill(vector x_coordinate, vector y_coordinate, Environment& env);
 
         // fill assigned pixel
-        color fill_pixel(double pixel_x, double pixel_y, Sphere& target);
+        color fill_pixel(double pixel_x, double pixel_y, Environment& env);
+
+        // take all objects hit by ray and find the first hit
+        BounceRay* first_object_hit(const std::vector<BounceRay*>& result_normals);
+
 
 
     public:
@@ -45,6 +48,7 @@ class Camera : public Object {
         // temporary target argument for both shoot_rays and take_picture functions
         // change Object argument to environment and loop over every object in the sceene
         std::ostream& take_picture(std::ostream& output, Sphere& target);
+        std::ostream& take_picture(std::ostream& output, Environment& env); 
 
         // sampling methods
         enum class sample_method {

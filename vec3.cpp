@@ -34,10 +34,10 @@ vec3& vec3::operator/=(const double t) {
 }
 
 double vec3::length() const {
-    return std::sqrt(lenght_squared());
+    return std::sqrt(length_squared());
 }
 
-double vec3::lenght_squared() const {
+double vec3::length_squared() const {
     return at(0)*at(0) + at(1)*at(1) + at(2)*at(2);
 }
 
