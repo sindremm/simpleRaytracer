@@ -112,9 +112,8 @@ color Camera::five_sample_fill(vector x_coordinate, vector y_coordinate, Environ
 }
 
 color Camera::jitter_sample_fill(vector x_coordinate, vector y_coordinate, Environment& env) {
-    color total_color;
-    int total_samples = 30;
-    for (int i = 0; i < total_samples; i++) {
+    Shader pixel_shader;
+    for (int i = 0; i < samples_per_pixel; i++) {
         double random_x =  (static_cast<double>(rand()) / RAND_MAX) * pixel_width - pixel_width/2;
         double random_y = (static_cast<double>(rand()) / RAND_MAX) * pixel_heigth - pixel_heigth/2;
 
@@ -128,17 +127,11 @@ color Camera::jitter_sample_fill(vector x_coordinate, vector y_coordinate, Envir
             a->calculate_hit(camera_ray, hit_objects);
         }
 
-        BounceRay* closest_ray = first_object_hit(hit_objects);
-        if (closest_ray != nullptr) {
-            total_color += closest_ray->source->color_value;
-        } else {
-            total_color += {20, 20, 20};
-        }
-        delete closest_ray;
+        pixel_shader.add_sample_ray(first_object_hit(hit_objects));
 
     }    
     
-    return total_color/total_samples;
+    return pixel_shader.calculate_color();
 }
 
            
