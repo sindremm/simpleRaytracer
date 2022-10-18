@@ -12,3 +12,12 @@ void Environment::add_hittable_object(HittableObject* hit_obj) {
     return;
 }
 
+void Environment::set_environment_color(color new_color) {
+    environment_color = new_color;
+}
+
+
+color Environment::get_color() {
+    return environment_color;
+}
+

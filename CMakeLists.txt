@@ -12,6 +12,7 @@ set(SOURCES
     environment.cpp
     light.cpp
     objecthit.cpp
+    shader.cpp
 )
 
 
